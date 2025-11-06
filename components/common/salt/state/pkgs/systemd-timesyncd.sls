@@ -1,0 +1,3 @@
+systemd-timesyncd:
+  pkg:
+    - installed

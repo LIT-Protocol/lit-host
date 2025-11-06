@@ -1,0 +1,25 @@
+au BufWinLeave * mkview
+au BufWinEnter * silent loadview
+
+:set bs=2
+:set ruler
+:syntax on
+:set hlsearch
+set smartindent
+set tabstop=2
+set shiftwidth=2
+set expandtab
+
+nnoremap <F4> :set invpaste paste?
+
+set iskeyword+=:
+:set completeopt=longest,menu,preview
+
+au BufNewFile,BufRead *.phtml set filetype=php
+
+set encoding=utf-8
+au BufNewFile,BufRead *.tt set filetype=html
+
+set mouse-=a
+
+let g:skip_defaults_vim = 1

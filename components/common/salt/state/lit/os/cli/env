@@ -1,0 +1,3 @@
+if [ "$SHELL" == "/bin/bash" ]; then
+  . /opt/lit/env.bash
+fi

@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Dist
+/build
+
+# IDEs
+*.iml
+.idea
+*.gz
+*.core

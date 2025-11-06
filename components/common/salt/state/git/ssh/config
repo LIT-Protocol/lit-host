@@ -1,0 +1,7 @@
+{%- if 'git_ssh_keys' in pillar %}
+{% for name, _ in salt.pillar.get('git_ssh_keys', {}).items() -%}
+Host github.com-{{ name }}
+        Hostname github.com
+        IdentityFile=/home/git/.ssh/id_git_{{ name }}
+{% endfor %}
+{% endif -%}

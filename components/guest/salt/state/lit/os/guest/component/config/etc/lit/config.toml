@@ -1,0 +1,22 @@
+[guest]
+active = true
+{% if 'litos_guest_allowed_cfg_keys' in pillar %}
+allowed_cfg_keys = [
+{%- for k in pillar.litos_guest_allowed_cfg_keys -%}
+"{{ k }}"{% if not loop.last %}, {% endif -%}
+{%- endfor -%}
+]
+{% endif %}
+
+{% set build_info = pillar.build_info %}
+[build]
+id = "{{ build_info.build_id }}"
+type = "{{ build_info.build_type }}"
+{%- if 'build_kind' in build_info %}
+kind = "{{ build_info.build_kind }}"
+{%- endif %}
+unix = "{{ build_info.build_unix }}"
+date = "{{ build_info.build_date }}"
+opt_ro = {% if build_info.get('build_opt_ro', False) == True %}true{% else %}false{% endif %}
+opt_users = {% if build_info.get('build_opt_users', False) == True %}true{% else %}false{% endif %}
+opt_ssh = {% if build_info.get('build_opt_ssh', False) == True %}true{% else %}false{% endif %}

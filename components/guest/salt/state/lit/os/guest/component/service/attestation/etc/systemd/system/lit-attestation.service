@@ -1,0 +1,18 @@
+{% set log_name='lit-attestation-service' %}
+
+[Unit]
+Description=Lit Attestation Service
+After=syslog.target network.target remote-fs.target nss-lookup.target {% if pillar.get('litos_guest', False) == True %} rc-local.service{% endif %}
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lit/attestation
+Environment="RUST_LOG={% if log_name in pillar.logging %}{{ pillar.logging[log_name][pillar.env].level }}{% else %}{{pillar.logging.default[pillar.env].level }}{% endif %}"
+ExecStart=/opt/lit/attestation/bin/lit-attestation-service
+ExecStartPost=/usr/bin/setfacl -m g:lit-attestation-user:rwx /var/run/lit-attestation-service.sock
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

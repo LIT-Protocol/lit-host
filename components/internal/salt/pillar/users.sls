@@ -1,0 +1,114 @@
+users:
+  mike:
+    active: True
+    name: Mike L
+    email: mike@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - prod
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyCKHIxBG7XlMpDqyI7GKvNv7UCkdd4mCnEGV98xObH
+  chris:
+    active: True
+    name: Chris C
+    email: chris@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - prod
+      - staging
+      - dev
+    ssh_keys:
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJBadixwLYNJje+dMIbei9mnAfagGV7EGH1G0sJNaXLP4t3qiJnZpApubSoV/6oEcf3O8MNbPh153VnnrUpYgfA= Lit-Protocol@secretive.h4ckb00k-m1.local
+      - ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIpMMJlUMi+5301UJyFw2yJX9Cs53RgGKvnODCW/qJGSw9IcoIHxlfdmmE/Dhy82jTKh44K8Ur2FCaXmnwknj59zqrZ7l2jrOC3IuduQ0KrYTp3Sbkyk3acESIBJ7/PURw== Key-For-PIV-Authentication-(chris)@secretive.h4ckb00k-m1.local
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5uQh+KHcXs9LYyhkzBDcZv4HYgjRDzK8eDf+VOQVHi chris@litprotocol.com
+  howard:
+    active: True
+    name: Howard
+    email: howard@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - prod
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE5Ue8ib58nHNCbWaaZzFSstZVdSu5p6p27ISjz6yhNi howard.tam.95@gmail.com
+      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFx4XvIefOJOJAVPNeAzT8NolNTt7KLMOP05UboxtGHNwxgkHiQQqulXUz90l6jCwl5/oSCINWiE4yjPmkB+WRU= Git@secretive.Howard’s-MacBook-Pro.local
+  brendon:
+    active: True
+    name: Brendon
+    email: brendon@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCodvWfWQDrahjyOqlFGbZELjtpZwbg6ZA46ihX8ZtNgSdiZ5De9ikrbyTaFnjByGFr9U4yDVVB3VsPeDsl/p/mD6nLtl/9qIXg4tFiuJNrtoVnyVyHnxzV5Jcip70w2CE5tXznkAr0Gmy6qfrqCWCE1X+3imitL1x68+n4jNmtvHhNXGSB1vDpYZmpq3HpL3N/VeJMJX/jJqMLlPm9YBMJh4UFBbeYoMm27qfFhcGjbipBscQoNQgOlLRvgZzFYMLEy4jWjgmWQi+eajxcZfWjlZnfYJO6Z+A5FiekJ6hXBLBrn86Ng1VVfm3+PhuohkJ8qXGwhXzymA9gzDDdJUdS0ZtN6bL54KshKB56G3nehB0TogcQpQPxqFoJxPW7yYq6enhHxpio/F3xCtxiB8Jl3QkJaHPPwmQR9PAgn6gSPZ8QtELmReHjElLUj+3DAhJUflR6yPHqKmTU4eXKMbwWVt/5AZlMtbuU6Mq2V4eeZO0TuIwhG5JyDgAcGXTEBefpt32oT3yAMIsL6sAx0bUyhAlKQRZNV5LND1rjkpSwIEG3LDsSFgtw5aMGWiTIK8kdyFhKTWiK1/Rieau0sbjcCyGEn7aZPK8/1yK8MV204YAjjA/FSp+55pyjzSECUMJ+k+Ku2rM3deJ/PjNuA/F3ZyiB+qlADceWwuisuv9Dzw== brendonpaul@Brendons-MacBook-Pro.local
+  anson:
+    active: True
+    name: Anson
+    email: anson@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDTbSkTfpf/cFA+clj2YwOVaS15nONtSEEc2ZOHN6go5OwND1RXqJK+o7TYED1Wtt0lQnFywbdapeakAA2ZWKYB3ZM0+ZfwNjj0/eYrwrou7sPUQ5CnsEuTiFOXZpahV/92Q+6OXUUoir8BtoL/pzuE2D/dhPHeHiZtIzb07ZT0QPwMgTRZmmAQG5zpv7++kDDu4I7QkBFHRXhBqdAYQ77K5270bUY32EoGA+kCuDsMcscPd3O5PPwx3337hyDIO+bEqklDV/v8hgITQd4594Mqe3OCXvKo71h73ReZb+gj3GKZVFvREEvlmf7kafwhOVl7E74PRFq24hNE91MYB8aNZWUKv7CoI+V4ycKmI+LHzA5FnC1ALuvxJR3IyMtFUV6HvOBzDPrJNXfWvLQebR29y4pNZKJ6qYXWpOl80tXSZ5+eFgrTVyA8lO0GR/RE+H0lslsSzCq+OLo3hefJDMBZ1HodcSvBln/llYcv0/qsJecM5mFiRNIdbWhpmRF249s= anson@Ansons-MacBook-Pro-2.local
+  adam:
+    active: True
+    name: Adam Reif
+    email: adam@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - prod
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIApBWGz5gdYttQgru11P2LM+kKtbJ9uzjaL8h45Q2kHG adam@litprotocol.com
+  adarsh:
+    active: True
+    name: Adarsh Kumar
+    email: adarsh@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - prod
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1l7ODAEvJRFfovRYCqAMuS0Am0QcneipqbgZ0v880R04f4UA67QFaJidG6s1KVjLb9md0UIUkPU62zE9L3sDolKoGmhmBfP+pQkf6OTkASeVQgytJ2YXb5s74kYU8YUhN7QZwQFUfj4sa7vuhLfWj2hLuzjOdLQhifG1Yah2DSyFLn5pf1HuI4JTPCPzMv9mtr9D4dF+bSI+r3ek7jLyEG9HRXIvWTMGgcrIBVTSdgBMkjge9qDMf/b7VEXYUv4Ggg9VUzJ5v8XqAFux/LpKRSaxZusliGNuE02uThlewGsFvhRNw4EWee1a+wAZt2hGqaaFFIPiLhSHGegQPt/bZ7HFC/OIs+mftxDfKWzlmgjPMAgknogGOD20h1p53149fBkyN6mt34Ckd20n2MmMdgvGU61RLiz06D/yYICq9eBsZ5bDyuH2DZ1B28HSeo/7pCNa3e1ao0xq9kmAG/UzU5ypugkPcz84LE33ykxBMBOA5eE1iMiLcZnMT5TlEBdE= adarshkumar@Adarshs-MacBook-Pro.local
+  abhishek:
+    active: True
+    name: Abhishek Kapoor
+    email: abhishek@litprotocol.com
+    shell: /bin/bash
+    groups:
+      - lit
+      - admin
+    access:
+      - prod
+      - staging
+      - dev
+    ssh_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/QZZsME8Dj1bbUotaqh+x5K/MKC/ouTSwH/Qaz/3Lfz/b4o93jMq2qt3B1HA1Wl5+Gj6zWg766Oqq+lXAGaJJdas9XLmMvo+3H3icGB8UusQAY8PJoHj1sUecDucyzU5ZUchhi4cXdeKyi/W7z5zzEhL9eXQADew039MLo4nF23WNfbpNIBk6Wzj0AbeR+VbyoxQSRAf5FiJpz0EQUOFePMUs5zaxJOtN+BRtg9Nbrrcq2inpHw4Aj8xG3vGXk7A8S62BSuWFTyuj6DKAidJ/tTThUjs9adDAI4Hei1NTU2cnJoF7hWQQelsi+YyxX9SbTIfd1XSCu1R/v8yqaccCh+ALDxJmPD28cjm1xt5biWRg8o+VU4JsKIyOuEN9sTXI0Mn/5+zyPoBGom/tA0+qbzwsFORNMvhzD8A0IQviNFIIiSYh9UkBCySVg7fhj5vpjpdKbUNSvyAXxa/GEWVkezoVkQ3zK0D0S32nG84wfarCCNYJQJ1oVxh9ckdQqKDXdPAVPU69m8VCXLDoCQS2ARCV6qIll9GcJdasbRf6UeqZ76vwSRoUWr9EXxL3ppf5S6IyZZ74qtb0XIt6AWPyUjZIubd00azBboWPpuzzfehKuR4ZZ+5basqSKNaqd2CTu4XvpVvRECBA8T3n5woiwOzzcBamVLORG1d09J0w/w== abkapoor@Abhisheks-MBP

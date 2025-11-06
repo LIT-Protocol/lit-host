@@ -1,0 +1,3 @@
+pkg-config:
+  pkg:
+    - installed

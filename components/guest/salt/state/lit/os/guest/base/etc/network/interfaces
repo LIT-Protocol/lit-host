@@ -1,0 +1,2 @@
+# Include files from /var/local/etc/network/interfaces.d:
+source-directory /var/local/etc/network/interfaces.d

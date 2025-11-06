@@ -1,0 +1,94 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
+  file_storage/filelogreceiver:
+    directory: /var/lib/otelcol/file_storage/filelogreceiver
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+  # Collect own metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "otel-collector"
+          scrape_interval: 10s
+          static_configs:
+            - targets: ["0.0.0.0:8888"]
+  filelog:
+    include: [/logs/otel.log]
+    storage: file_storage/filelogreceiver
+  journald:
+    units:
+      - ssh
+      - docker
+      - containerd
+      - lit-node-operator
+
+connectors:
+  filteringrouter:
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 4000
+  batch:
+  resource:
+    attributes:
+      - key: "url.domain"
+        action: "insert"
+        ### The following section will be updated by init_logging_facilities in common.sh
+        ### BEGIN AUTO SECTION, DO NOT EDIT
+        # This is the domain of the URL that the logs are coming from
+        value: "<URL_DOMAIN>"
+        ### END AUTO SECTION
+      - key: "lit.subnet.id"
+        action: "insert"
+        ### The following section will be updated by init_logging_facilities in common.sh
+        ### BEGIN AUTO SECTION, DO NOT EDIT
+        # This is the subnet ID of the GCP project
+        value: "<SUBNET_ID>"
+        ### END AUTO SECTION
+
+exporters:
+  googlecloud:
+    log:
+      default_log_name: opentelemetry.io/collector-exported-log
+      resource_filters:
+        - prefix: "url"
+        - prefix: "service"
+        - prefix: "lit"
+    metric:
+      resource_filters:
+        - prefix: "url"
+        - prefix: "service"
+        - prefix: "lit"
+        - prefix: "system_"
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    logs/logs_metrics_and_traces:
+      receivers: [filelog]
+      processors: [memory_limiter]
+      exporters: [filteringrouter]
+    logs:
+      receivers: [otlp, filteringrouter, journald]
+      processors: [resource, memory_limiter, batch]
+      exporters: [debug, googlecloud]
+    metrics:
+      receivers: [otlp, filteringrouter]
+      processors: [resource, memory_limiter, batch]
+      exporters: [debug, googlecloud]
+    traces:
+      receivers: [filteringrouter]
+      processors: [resource, memory_limiter, batch]
+      exporters: [debug, googlecloud]
+
+  extensions: [health_check, pprof, zpages, file_storage/filelogreceiver]

@@ -1,0 +1,12 @@
+[api.prov]
+
+[api.prov.http]
+enabled = true
+port = 8080
+port_external = 80
+
+[api.prov.https]
+enabled = true
+port = 8443
+port_external = 443
+tls_auto = { enabled = true }

@@ -1,0 +1,12 @@
+include:
+  - lit.core.defaults
+  - lit.os.guest.global
+  - lit.os.guest.defaults
+  - groups
+  - users
+  - local.users
+  - blockchain
+  - local.blockchain
+  - logging
+  - local.logging
+  - local.defaults

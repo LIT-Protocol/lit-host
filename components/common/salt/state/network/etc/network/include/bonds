@@ -1,0 +1,20 @@
+{% if 'net_iface_bonds' in pillar %}
+{% for bond, bondinfo in salt.pillar.get('net_iface_bonds', {}).items() %}
+auto {{ bond }}
+{% if 'net_iface_bonds_static' in pillar and bond in pillar.net_iface_bonds_static and 'ip' in pillar.net_iface_bonds_static[bond] %}
+iface {{ bond }} inet static
+    address {{ pillar.net_iface_bonds_static[bond].ip }}
+    gateway {{ pillar.net_iface_bonds_static[bond].gw }}
+{% elif 'net_out_iface' in pillar and pillar.net_out_iface == bond and 'net_out_ip4' in pillar and 'net_out_gw4' in pillar %}
+iface {{ bond }} inet static
+    address {{ pillar.net_out_ip4 }}
+    gateway {{ pillar.net_out_gw4 }}
+{% else %}
+iface {{ bond }} inet {{ bondinfo.proto }}
+{% endif %}
+    bond-slaves {% for slave in bondinfo.slaves %}{{ slave }} {% endfor %}
+    bond-miimon {{ bondinfo.miimon }}
+    bond-mode {{ bondinfo.mode }}
+
+{% endfor %}
+{% endif %}

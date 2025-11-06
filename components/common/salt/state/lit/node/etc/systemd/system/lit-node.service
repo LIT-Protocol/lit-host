@@ -1,0 +1,20 @@
+{% set log_name='lit-node' %}
+
+[Unit]
+Description=Lit Node
+After=syslog.target network.target remote-fs.target nss-lookup.target {% if pillar.get('litos_guest', False) == True %}rc-local.service lit-attestation.service lit-logging.service{% endif %}
+{% if pillar.get('litos_guest', False) == True %}Requires=rc-local.service lit-attestation.service lit-logging.service{% endif %}
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lit/node
+Environment="RUST_LOG={% if log_name in pillar.logging %}{{ pillar.logging[log_name][pillar.env].level }}{% else %}{{pillar.logging.default[pillar.env].level }}{% endif %}"
+ExecStart=/opt/lit/node/bin/lit_node
+LimitNOFILE=64000
+Restart=always
+RestartSec=5
+User=lit-node
+OOMScoreAdjust=-1000
+
+[Install]
+WantedBy=multi-user.target

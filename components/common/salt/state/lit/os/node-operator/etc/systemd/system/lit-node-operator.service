@@ -1,0 +1,20 @@
+{% set log_name='lit-node-operator' %}
+
+[Unit]
+Description=Lit Node Operator Service
+After=network.target
+# Allow the service to restart indefinitely (even if it keeps failing)
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Environment="RUST_LOG={% if log_name in pillar.logging %}{{ pillar.logging[log_name][pillar.env].level }}{% else %}{{pillar.logging.default[pillar.env].level }}{% endif %}"
+User=root
+Group=root
+Restart=always
+RestartSec=30
+ExecStart=/opt/lit/operator/bin/lit-node-operator
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,36 @@
+services:
+  otel-collector:
+    image: litptcl/otelcontribcol:5707d7163e1f2f5cd6be16c850df6e90b5b4ca7f
+    volumes:
+      - /etc/monitoring/otelcol/otel-collector-config.yaml:/etc/otel/config.yaml
+
+      # Mount for the service account key
+      - /etc/monitoring/otelcol/service-account-key.json:/etc/otelcol-contrib/key.json
+
+      # Journald mounts - required for journald receiver
+      - /run/systemd/journal/socket:/run/systemd/journal/socket
+      - /run/log/journal:/run/log/journal:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+
+      # Mount for the filelogreceiver to track its own state (eg. cursor).
+      - /var/monitoring/otelcol/file_storage/filelogreceiver:/var/lib/otelcol/file_storage/filelogreceiver
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/etc/otelcol-contrib/key.json
+    # Tell the container to run as root to resolve any issues reading log mounted log files.
+    user: "0:0"
+    # capabilities needed for journald access
+    cap_add:
+      - SYS_ADMIN
+      - AUDIT_READ
+    ports:
+      - 127.0.0.1:1777:1777 # pprof extension
+      - 127.0.0.1:13133:13133 # health_check extension
+      - 127.0.0.1:4317:4317 # OTLP gRPC receiver
+      - 127.0.0.1:4318:4318 # OTLP http receiver
+      - 127.0.0.1:55679:55679 # zpages extension
+    logging:
+      driver: json-file # This is the default logging driver for Docker.
+      options:
+        max-size: "15G" # Maximum size of a log file before rotation
+        max-file: "3" # Maximum number of log files to keep

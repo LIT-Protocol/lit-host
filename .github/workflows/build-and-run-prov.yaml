@@ -1,0 +1,46 @@
+name: Build Prov Template and run node instance
+
+on:
+  workflow_call:
+
+jobs:
+  build-prov-template:
+    runs-on: [self-hosted, litos-ci-runner]
+    steps:
+      - name: Build prov template
+        run: |
+          mkdir -p ~/prov_logs
+          (sudo lit os guest template create prov | tee ~/prov_logs/prov_template_output.txt) 3>&1 1>&2 2>&3 | tee ~/prov_logs/prov_template_stderr.txt
+          echo "prov template build" >> GITHUB_STEP_SUMMARY
+          if ! cat ~/prov_logs/prov_template_output.txt | grep -q "Failed:      0"; then
+            echo "Error: Seems salt steps failed, 'Failed:      0' not found in output for prov template creation" >> GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+      - name: Upload prov template output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prov-outputs
+          path: ~/prov_logs/
+          retention-days: 7
+  # NOTE: Running prov needs deployed contracts and the deployer account, add later
+  # run-prov:
+  #   needs: build-prov-template
+  #   runs-on: [self-hosted, litos-ci-runner]
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+  #     - name: Create Prov
+  #       run: |
+  #         cd ./.github/resources && ./create_prov.sh
+  #     - name: Delete instance
+  #       if: always()
+  #       run: |
+  #         sudo lit os guest instance delete all
+  #     - name: Upload prov instance output
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: prov-outputs
+  #         path: prov_instance_output.txt
+  #         retention-days: 7

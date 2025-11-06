@@ -1,0 +1,88 @@
+name: Build Node Template and run node instance
+
+on:
+  workflow_call:
+
+jobs:
+  build-node-template:
+    runs-on: [self-hosted, litos-ci-runner]
+    steps:
+      - name: Build node template
+        run: |
+          mkdir -p ~/node_logs
+          (sudo lit os guest template create node | tee ~/node_logs/node_template_output.txt) 3>&1 1>&2 2>&3 | tee ~/node_logs/node_template_stderr.txt
+          echo "node template build" >> GITHUB_STEP_SUMMARY
+          cat ~/node_logs/node_template_stderr.txt >> GITHUB_STEP_SUMMARY
+          if ! cat ~/node_logs/node_template_output.txt | grep -q "Failed:      0"; then
+            echo "Error: Seems salt steps failed, 'Failed:      0' not found in output for node template creation" >> GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+      - name: Upload node template output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-template-logs
+          path: ~/node_logs
+          retention-days: 7
+      - name: Delete node_logs directory
+        if: always()
+        run: rm -rf ~/node_logs
+  run-node:
+    runs-on: [self-hosted, litos-ci-runner]
+    needs: build-node-template
+    env:
+      REQUIRED_SERVICES: |
+        lit-logging.service
+        lit-actions.service
+        lit-node.service
+        osqueryd.service
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Download sev-host-identity (currently needed for --self-signed, TODO remove this reliance)
+        run: |
+          curl -o sev-host-identity https://storage.googleapis.com/lit-dev-inofficial-public-trashheap/sev-host-identity
+          sudo mv sev-host-identity /usr/local/bin/
+          sudo chmod +x /usr/local/bin/sev-host-identity
+      - name: Create Node
+        run: |
+          mkdir -p ~/node_logs
+          (cd ./.github/resources && ./create_node.sh | tee ~/node_logs/node_instance_output.txt) 3>&1 1>&2 2>&3 | tee ~/node_logs/node_instance_stderr.txt
+      - name: Check expected node instance outputs
+        run: |
+          echo "node instance run" >> $GITHUB_STEP_SUMMARY
+          grep "FAIL" ~/node_logs/node_instance_output.txt >> $GITHUB_STEP_SUMMARY
+          grep "error" ~/node_logs/node_instance_output.txt >> $GITHUB_STEP_SUMMARY
+          echo "\nstderr" >> $GITHUB_STEP_SUMMARY
+          cat ~/node_logs/node_instance_stderr.txt >> $GITHUB_STEP_SUMMARY
+          missing=0
+          while read -r svc; do
+            [ -z "$svc" ] && continue
+            if ! grep -q "Started $svc" ~/node_logs/node_instance_output.txt; then
+              echo "Missing: $svc" >> $GITHUB_STEP_SUMMARY
+              missing=1
+            fi
+          done <<< "$REQUIRED_SERVICES"
+          [ "$missing" -eq 0 ] || exit 1
+      - name: Extract node instance name
+        run: |
+          id="$(sudo lit os ps | grep node-dev | cut -d '|' -f 3 | xargs)"
+          echo "Extracted hash: $id"
+          [ -z "$id" ] && exit 1
+          echo "INSTANCE_ID=$id" >> "$GITHUB_ENV"
+      - name: Wait for 5 minutes to let node logs accrue
+        run: sleep 300
+      - name: Copy otel.log (naga and newer)
+        if: ${{ !contains(github.event.inputs.branch_assets, 'datil') }}
+        run: cp /var/lit/os/guest/instances/dev/node/$INSTANCE_ID/logs/otel.log ~/node_logs/
+      - name: Delete instance
+        if: always()
+        run: |
+          sudo lit os guest instance delete all
+      - name: Upload node instance output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-instance-outputs
+          path: ~/node_logs
+          retention-days: 7

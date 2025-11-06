@@ -1,0 +1,78 @@
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# Allow established connections (the responses to our outgoing traffic)
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# Allow local programs that use loopback (Unix sockets)
+-A INPUT -i lo -j ACCEPT
+
+# Drop a packet if it is invalid
+-A INPUT -m conntrack --ctstate INVALID -j DROP
+
+{% if pillar.env == 'dev' or pillar.env == 'staging'  %}
+# Allow incoming SSH/SCP conections to this machine,
+-A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
+{% endif %}
+
+{% if 'firewall' in pillar -%}
+{% if 'tcp_ports' in pillar.firewall -%}
+# pillar.firewall.tcp_ports
+{%- for port in pillar.firewall.tcp_ports -%}
+-A INPUT -p tcp --dport {{ port }} -m state --state NEW -j ACCEPT
+{% endfor -%}
+{% endif %}
+
+{% if 'tcp_port_forwards' in pillar.firewall -%}
+# pillar.firewall.tcp_port_forwards
+{%- for port, to_port in pillar.firewall.get('tcp_port_forwards', {}).items() %}
+-A INPUT -p tcp --syn -d 127.0.0.1 --dport {{ to_port }} -m conntrack --ctstate NEW -j ACCEPT
+-A FORWARD -p tcp --syn --dport {{ port }} -m conntrack --ctstate NEW -j ACCEPT
+{% endfor -%}
+{% endif -%}
+{%- endif %}
+
+# Allow ping
+-A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+# Allow port 20051 for GRPC
+-A INPUT -p tcp --dport 20051 -j ACCEPT
+COMMIT
+
+*raw
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+{% if 'firewall' in pillar -%}
+{% if 'tcp_port_forwards' in pillar.firewall -%}
+# pillar.firewall.tcp_port_forwards
+{%- for port, to_port in pillar.firewall.get('tcp_port_forwards', {}).items() %}
+-A PREROUTING -p tcp --dport {{ port }} -j DNAT --to-destination 127.0.0.1:{{ to_port }}
+-A OUTPUT -p tcp --dport {{ port }} -d 127.0.0.1 -j REDIRECT --to {{ to_port }}
+{% endfor -%}
+{% endif -%}
+{%- endif %}
+COMMIT
+
+*security
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT

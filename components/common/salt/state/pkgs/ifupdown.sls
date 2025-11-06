@@ -1,0 +1,3 @@
+ifupdown:
+  pkg:
+    - installed

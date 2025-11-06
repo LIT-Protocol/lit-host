@@ -1,0 +1,3 @@
+ifenslave:
+  pkg:
+    - installed

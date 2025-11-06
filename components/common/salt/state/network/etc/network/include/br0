@@ -1,0 +1,14 @@
+auto br0
+{% if 'net_out_iface' in pillar and pillar.net_out_iface == 'br0' and 'net_out_ip4' in pillar and 'net_out_gw4' in pillar %}
+iface br0 inet static
+    address {{ pillar.net_out_ip4 }}
+    gateway {{ pillar.net_out_gw4 }}
+{% else %}
+iface br0 inet manual
+{% endif %}
+{% if 'net_br0_use' in pillar %}
+    bridge_ports {{ pillar.net_br0_use }}
+{% else %}
+    bridge_ports {{ pillar.net_iface0 }}
+{% endif %}
+    bridge_stp off

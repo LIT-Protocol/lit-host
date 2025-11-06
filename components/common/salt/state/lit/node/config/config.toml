@@ -1,0 +1,20 @@
+[node.http]
+enabled = true
+port = 8080
+port_external = 80
+
+[node.https]
+enabled = true
+port = 8443
+port_external = 443
+tls_auto = { enabled = true }
+
+[node]
+enable_payment = {% if pillar.lit_node[pillar.env].enable_payment %}true{% else %}false{% endif %}
+enable_actions_allowlist = {% if pillar.lit_node[pillar.env].enable_actions_allowlist %}true{% else %}false{% endif %}
+enable_epoch_transitions = {% if pillar.lit_node[pillar.env].enable_epoch_transitions %}true{% else %}false{% endif %}
+enable_ecdsa_dkg = {% if pillar.lit_node[pillar.env].enable_ecdsa_dkg %}true{% else %}false{% endif %}
+enable_observability_export = {% if pillar.lit_node[pillar.env].enable_observability_export %}true{% else %}false{% endif %}
+
+[ipfs]
+gateway = "{% if 'ipfs_gateway' in pillar.lit_node %}{{ pillar.lit_node.ipfs_gateway }}{% else %}https://ipfs.io/ipfs/{}{% endif %}"

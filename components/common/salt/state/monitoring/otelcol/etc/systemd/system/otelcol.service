@@ -1,0 +1,16 @@
+[Unit]
+Description=OTEL Collector
+After=network.target docker.socket
+Requires=docker.socket
+
+[Service]
+Type=simple
+WorkingDirectory=/etc/monitoring/otelcol
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
+ExecReload=/usr/bin/docker compose restart
+TimeoutStartSec=0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

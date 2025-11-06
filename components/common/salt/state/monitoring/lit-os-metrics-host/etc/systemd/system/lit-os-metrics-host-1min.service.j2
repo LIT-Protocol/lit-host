@@ -1,0 +1,22 @@
+[Unit]
+Description=Lit OS Metrics Host 1-Minute Collection
+After=network.target osqueryd.service otelcol.service
+Requires=osqueryd.service otelcol.service
+
+[Service]
+Type=oneshot
+Environment="LIT_LOGGING_JAEGER=1"
+Environment="OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317"
+ExecStart=/usr/local/bin/lit-os-metrics-host \
+    --query=cpu-info \
+    --query=memory-info \
+    --query=load-average \
+    --resource-attribute system_context=host \
+    --interval 1min
+User=root
+Group=root
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

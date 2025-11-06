@@ -1,0 +1,2 @@
+include:
+  - pkgs.salt-master

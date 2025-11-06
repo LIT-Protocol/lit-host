@@ -1,0 +1,16 @@
+include:
+  - debian_only
+  - hosts
+  - groups
+  - users
+  - time
+  - pkgs.sudo
+  - pkgs.acl
+  - pkgs.fail2ban
+  - pkgs.vim
+  - pkgs.tmux
+  - pkgs.python3-pip
+  - pkgs.jq
+  - pkgs.yq
+  - git
+  - sshd

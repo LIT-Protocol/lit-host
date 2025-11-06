@@ -1,0 +1,40 @@
+#!/usr/bin/expect
+
+set prompt {.*\$.* }
+
+set ip_address [lindex $argv 0]
+set gw [lindex $argv 1]
+set subnet_id [lindex $argv 2]
+set staker_address [lindex $argv 3]
+set wallet_key [lindex $argv 4]
+set coms_sender_key [lindex $argv 5]
+set coms_receiver_key [lindex $argv 6]
+set admin_address [lindex $argv 7]
+
+# create new node
+spawn sudo lit os guest instance create node \
+--net4-ip $ip_address --net4-gw $gw \
+-f --subnet-id $subnet_id \
+--node-staker-address $staker_address \
+--node-admin-address $admin_address \
+--vcpus 16 --mem 20G \
+--self-signed
+
+expect "Enter private key to node wallet:"
+send "$wallet_key\n"
+
+expect "Enter coms sender private key:"
+send "$coms_sender_key\n"
+
+expect "Enter coms receiver private key:"
+send "$coms_receiver_key\n"
+
+# wait up to 20mins for boot to complete
+set timeout 1200
+
+expect "Debian GNU/Linux 12 * ttyS0"
+
+# Send Ctrl+C to exit
+send "\x03"
+
+expect eof

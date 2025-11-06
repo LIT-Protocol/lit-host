@@ -1,0 +1,8 @@
+{%- if 'ipfs_bootstrap' in pillar %}
+{%- for peer in pillar.ipfs_bootstrap %}
+{%- set parts = peer.split(':') -%}
+/ip4/{{ parts[0] }}/tcp/4001/p2p/{{ parts[1] }}
+/ip4/{{ parts[0] }}/udp/4001/quic-v1/p2p/{{ parts[1] }}
+/ip4/{{ parts[0] }}/udp/4001/quic/p2p/{{ parts[1] }}
+{% endfor -%}
+{%- endif -%}

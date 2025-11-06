@@ -1,0 +1,20 @@
+{% set log_name='lit-prov-api' %}
+
+[Unit]
+Description=LitOS Prov API
+After=syslog.target network.target remote-fs.target nss-lookup.target {% if pillar.get('litos_guest', False) == True %}rc-local.service lit-attestation.service lit-logging.service{% endif %}
+{% if pillar.get('litos_guest', False) == True %}Requires=rc-local.service lit-attestation.service lit-logging.service{% endif %}
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lit/os/prov/api
+Environment="RUST_LOG={% if log_name in pillar.logging %}{{ pillar.logging[log_name][pillar.env].level }}{% else %}{{pillar.logging.default[pillar.env].level }}{% endif %}"
+ExecStartPre=+/opt/lit/os/prov/bin/before-start.sh
+ExecStart=/opt/lit/os/prov/bin/api
+Restart=always
+RestartSec=5
+User=lit-prov
+OOMScoreAdjust=-1000
+
+[Install]
+WantedBy=multi-user.target

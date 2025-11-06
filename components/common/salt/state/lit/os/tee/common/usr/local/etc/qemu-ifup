@@ -1,0 +1,20 @@
+#!/bin/sh
+
+IFACE="${1}"
+TYPE=${IFACE%.*}
+case "$TYPE" in
+  tap0)       BRIDGE="br0"
+      shift
+      ;;
+  vmtap0)     BRIDGE="vmbr0"
+      shift
+      ;;
+  *)
+      echo "ERROR: Invalid interface: $IFACE (type: $TYPE)"
+      exit 1
+      ;;
+esac
+
+ip link set "$IFACE" up
+sleep 0.5s
+ip link set "$IFACE" master "$BRIDGE"

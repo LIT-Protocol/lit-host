@@ -1,0 +1,186 @@
+name: Reinstall Leaseweb Server
+
+# This workflow is triggered by a push to the repo or manually via the GitHub UI.
+# It reinstalls the host and registers a runner on it.
+# Then it deploys lit-os to the host.
+# Then it reboots the host and waits for it to come back online.
+# Then it builds and runs the node and prov.
+# If not manually specified, the branch for both os and assets will be the same as the branch that triggered the workflow.
+# It follows that a lit-assets branch with the same name as the lit os branch must exist
+
+on:
+  push:
+    branches:
+      - release*
+      - main
+      - develop
+      - datil
+  workflow_dispatch:
+    inputs:
+      branch_os:
+        description: 'Branch for OS'
+        required: true
+        default: 'develop'
+      branch_assets:
+        description: 'Branch for Assets'
+        required: true
+        default: 'develop'
+
+concurrency:
+  group: reinstall-leaseweb-server
+  cancel-in-progress: false
+
+env:
+  HOST: leaseweb-staging-7.litgateway.com
+  BRANCH_OS: ${{ github.event.inputs.branch_os || github.ref_name }}
+  BRANCH_ASSETS: ${{ github.event.inputs.branch_assets || github.ref_name }}
+
+jobs:
+  reinstall-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Initiate OS Reinstallation
+        id: reinstall
+        timeout-minutes: 60
+        # NOTE: the postinstall script is base64 encoded, run `base64 -i postinstall.sh -o postinstall.sh.b64 and copy the `
+        # NOTE: Leaseweb API is here https://developer.leaseweb.com/api-docs/dedicatedservers_v2.html
+        # NOTE: The SSH Key is on Bitwarden at "Lit OS CI SSH Key"
+        run: |
+          response=$(curl -X POST "https://api.leaseweb.com/bareMetals/v2/servers/12064909/install" \
+          -H "X-LSW-Auth: ${{ secrets.LEASEWEB_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "operatingSystemId": "DEBIAN_12_64BIT",
+            "hostname": "leaseweb-staging-7",
+            "password": "${{ secrets.CI_SERVER_ROOT_PW }}",
+            "sshKeys": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIQBVjzA1vz1VGbyZyYefVIqPWt1l8kPFjyN2GBKyo9E adam@Adams-MacBook-Pro.local",
+            "timezone": "America/New_York",
+            "device": "U2_960GBMU",
+            "partitionScheme": "AUTO",
+            "raid": {
+              "level": "1",
+              "type": "SW"
+            },
+            "powerCycle": true,
+            "postInstallScript": "IyEvYmluL2Jhc2gKCiMgU2V0IFRpbWV6b25lIChOT1RFOiBMZWFzZXdlYiBBUEkgX3Nob3VsZF8gYmUgc2V0dGluZyB0aGlzLCBidXQgaXQgZG9lc24ndCkKbG4gLXNmIC91c3Ivc2hhcmUvem9uZWluZm8vQW1lcmljYS9OZXdfWW9yayAvZXRjL2xvY2FsdGltZQplY2hvICJBbWVyaWNhL05ld19Zb3JrIiA+IC9ldGMvdGltZXpvbmUKCiMgVXBkYXRlIGFuZCBpbnN0YWxsIGRlcGVuZGVuY2llcwphcHQtZ2V0IHVwZGF0ZSAmJiBhcHQtZ2V0IGluc3RhbGwgLXkgY3VybAoKIyBDcmVhdGUgYSBjaSB1c2VyIChtYWluIFNTSCB1c2VyKQphZGR1c2VyIC0tZGlzYWJsZWQtcGFzc3dvcmQgLS1nZWNvcyAiIiBjaQoKIyBDb3B5IGF1dGhvcml6ZWQgU1NIIGtleSBmcm9tIHJvb3QgdG8gY2kKbWtkaXIgLXAgL2hvbWUvY2kvLnNzaApjcCAvcm9vdC8uc3NoL2F1dGhvcml6ZWRfa2V5cyAvaG9tZS9jaS8uc3NoL2F1dGhvcml6ZWRfa2V5cwpjaG93biAtUiBjaTpjaSAvaG9tZS9jaS8uc3NoCmNobW9kIDcwMCAvaG9tZS9jaS8uc3NoCmNobW9kIDYwMCAvaG9tZS9jaS8uc3NoL2F1dGhvcml6ZWRfa2V5cwpzeXN0ZW1jdGwgcmVsb2FkIHNzaAojIEFsbG93IGNpIHVzZXIgdG8gc3VkbyB3aXRob3V0IHBhc3N3b3JkCmVjaG8gImNpIEFMTD0oQUxMKSBOT1BBU1NXRDpBTEwiIHwgdGVlIC9ldGMvc3Vkb2Vycy5kL2NpCmNobW9kIDA0NDAgL2V0Yy9zdWRvZXJzLmQvY2kK"
+          }'
+          )
+          if [ $? -ne 0 ]; then
+            echo "API call failed"
+            exit 1
+          fi
+          if echo $response | jq -e '.errorCode' > /dev/null; then
+            echo "Error in response: $response"
+            exit 1
+          fi
+          job_id=$(echo $response | jq -r '.uuid')
+          echo "created job $job_id"
+          echo "job_id=$job_id" >> $GITHUB_OUTPUT
+      - name: Check Job Status
+        run: |
+          while true
+          do
+            sleep 30  # Add a small delay to avoid excessive API calls
+            job_status=$(curl -s -H "X-LSW-Auth: ${{ secrets.LEASEWEB_API_TOKEN }}" \
+                "https://api.leaseweb.com/bareMetals/v2/servers/12064909/jobs/${{ steps.reinstall.outputs.job_id }}" | jq -r '.status')
+            echo "job status of ${{ steps.reinstall.outputs.job_id }} -> $job_status"
+            if [ "$job_status" == "ACTIVE" ]; then
+              continue
+            elif [ "$job_status" == "FINISHED" ]; then
+              echo "Reinstallation completed successfully"
+              exit 0
+            else
+              echo "Reinstallation failed or was cancelled"
+              exit 1
+            fi
+          done
+  register-runner:
+    needs: reinstall-server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CI_RUNNER_SSH_PRIVKEY }}
+          known_hosts: unnecessary
+      - name: Install and register runner
+        run: |
+          # Get a new runner token from GitHub API
+          RUNNER_TOKEN=$(curl -sS \
+            -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.PAT_ORG_RUNNER_CREATION }}" \
+            https://api.github.com/repos/LIT-Protocol/lit-os/actions/runners/registration-token | jq -r .token)
+          echo "::add-mask::$RUNNER_TOKEN" # TODO Mask the RUNNER_TOKEN as it's a secret
+          [ -z "$RUNNER_TOKEN" ] || [ "$RUNNER_TOKEN" -eq "null" ] && echo "Failed to get runner token" && exit 1
+          ssh -o StrictHostKeyChecking=no ci@$HOST << EOF
+            mkdir -p ~/actions-runner && cd ~/actions-runner
+            # Download and extract the GitHub Actions runner
+            curl -o actions-runner-linux-x64-2.319.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.319.1/actions-runner-linux-x64-2.319.1.tar.gz
+            tar xzf ./actions-runner-linux-x64-2.319.1.tar.gz
+            # Configure the runner
+            echo $RUNNER_TOKEN
+            ./config.sh --url https://github.com/LIT-Protocol/lit-os --token "$RUNNER_TOKEN" --name leaseweb-staging-7.litgateway.com --labels litos-ci-runner --unattended --replace
+            sudo su
+            cd /home/ci/actions-runner
+            sudo ./svc.sh install
+            sudo ./svc.sh start
+            exit
+          EOF
+      - name: Disable unattended upgrades service (to avoid conflicts with lit-os installation)
+        run: |
+          ssh -o StrictHostKeyChecking=no ci@$HOST "sudo systemctl stop unattended-upgrades && sudo systemctl disable unattended-upgrades && sudo pkill -f unattended-upgrades"
+  deploy-litos:
+    needs: reinstall-server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Runner SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CI_RUNNER_SSH_PRIVKEY }}
+          known_hosts: unnecessary
+      - name: Checkout lit-ansible
+        uses: actions/checkout@v4
+        with:
+          repository: LIT-Protocol/lit-ansible
+          token: ${{ secrets.PAT_LIT_ANSIBLE_CHECKOUT }}
+          ref: master
+          fetch-depth: 1
+          path: lit-ansible
+      - name: Install litos
+        working-directory: lit-ansible
+        run: |
+          ansible-playbook -v -i inventory -l $HOST deploy.yml --extra-vars "ansible_user=ci branch_os=$BRANCH_OS branch_assets=$BRANCH_ASSETS subnet_id=2f4638aA289f03B8caACe5BD3b017e75758c461F" --ssh-common-args='-o StrictHostKeyChecking=no'
+      - name: Install expect noninteractively
+        run: |
+          sudo apt install expect -y
+  reboot-host:
+    needs: [deploy-litos, register-runner]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.CI_RUNNER_SSH_PRIVKEY }}
+          known_hosts: unnecessary
+      - name: Reboot host
+        run: |
+          ssh -o StrictHostKeyChecking=no ci@$HOST "sudo reboot"
+      - name: Wait for host to come back online
+        timeout-minutes: 10
+        run: |
+          sleep 30
+          until ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ci@$HOST "echo 'Host is up'"; do
+            echo "Waiting for host to come back online..."
+            sleep 15
+          done
+          echo "Host is back online"
+
+  build-and-run-node:
+    needs: reboot-host
+    uses: ./.github/workflows/build-and-run-node.yaml
+
+  build-and-run-prov:
+    needs: build-and-run-node
+    uses: ./.github/workflows/build-and-run-prov.yaml

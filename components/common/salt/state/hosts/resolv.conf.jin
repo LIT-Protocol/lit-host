@@ -1,0 +1,5 @@
+domain {% if pillar['location'] %}{{ pillar['location'] }}.{% endif %}{{ pillar['domain'] }}
+search {% if pillar['location'] %}{{ pillar['location'] }}.{% endif %}{{ pillar['domain'] }}{% if 'search' in pillar %} {{ pillar['search'] }}{% endif %}
+{% for ns in pillar['nameservers'] -%}
+nameserver {{ ns }}
+{% endfor %}

@@ -1,0 +1,17 @@
+include:
+  - defaults
+  - internal.defaults
+  - local.defaults
+  - local.secrets
+  - local.secrets-prov
+  - groups
+  - users
+  - local.users
+  - git
+  - local.git
+  - security
+  - local.security
+  - blockchain
+  - local.blockchain
+  - logging
+  - local.logging

@@ -1,0 +1,59 @@
+[lit]
+env = "{{ pillar.env }}"
+
+{% if 'zerossl_api_key' in pillar -%}
+[zerossl]
+api_key = "{{ pillar.zerossl_api_key }}"
+
+{% if pillar.get('litos_guest', False) == False -%}
+[litos.guest.defaults.zerossl]
+api_key = "{{ pillar.zerossl_api_key }}"
+{%- endif %}
+{%- endif %}
+
+{% if 'pinata' in pillar and 'api_key' in pillar.pinata and 'api_secret' in pillar.pinata -%}
+[pinata]
+api_key = "{{ pillar.pinata.api_key }}"
+api_secret = "{{ pillar.pinata.api_secret }}"
+{%- endif %}
+
+[blockchain]
+chain_id = "{{ pillar.blockchain.chain[ pillar.env ].id }}"
+chain_name = "{{ pillar.blockchain.chain[ pillar.env ].name }}"
+
+[node]
+enable_chronicle_replica = {{ pillar.get('enable_chronicle_replica', False) | string | lower }}
+
+{% for contract_key, contract in pillar.blockchain.get('contract', {}).items() %}
+{%- for method_name, method in contract.items() %}
+{%- if pillar.env in method or 'default' in method %}
+[blockchain.contract.{{ contract_key }}.{{ method_name }}]
+{%- for key in ['gas', 'gas_price'] %}
+{%- if pillar.env in method and key in method[ pillar.env ] %}
+{{ key }} = "{{ method[ pillar.env ][ key ] }}"
+{%- elif 'default' in method and key in method.default %}
+{{ key }} = "{{ method.default[ key ] }}"
+{% endif -%}
+{% endfor -%}
+{% endif -%}
+{% endfor %}
+{% endfor %}
+
+{% if pillar.get('litos_guest', False) == False -%}
+{% if 'subnet_id' in pillar -%}
+[subnet]
+id = "{{ pillar.subnet_id }}"
+{%- endif %}
+{%- endif %}
+
+{% if 'litos_cfg_includes' in pillar -%}
+{%- for inc in pillar.litos_cfg_includes %}
+# begin include: {{ inc }}
+
+{% include inc %}
+
+# end include: {{ inc }}
+
+
+{% endfor -%}
+{%- endif %}

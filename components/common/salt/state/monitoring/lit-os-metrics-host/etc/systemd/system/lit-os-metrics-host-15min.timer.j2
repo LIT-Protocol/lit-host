@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Lit OS Metrics Host every 15 minutes
+
+[Timer]
+OnBootSec=120
+OnUnitActiveSec=15min
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

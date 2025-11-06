@@ -1,0 +1,13 @@
+[Unit]
+Description=OsQuery Daemon
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/osqueryd
+Restart=always
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
