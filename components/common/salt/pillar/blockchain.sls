@@ -7,8 +7,8 @@ blockchain:
             id: 175188
             name: yellowstone
         prod:
-            id: 175188
-            name: yellowstone
+            id: 175200
+            name: litMainnet
     # left as an example for how to override gas/gas_price
     #contract:
     #    # contract key
