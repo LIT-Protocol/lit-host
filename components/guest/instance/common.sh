@@ -187,13 +187,16 @@ services:
       - ${INSTANCE_LOGS_DIR}:/logs
 EOF
 
-  # We also need to update the latest guest / subnet information in the otelcol config file.
-  local otel_collector_config_file="/etc/monitoring/otelcol/otel-collector-config.yaml"
+  # Set Salt grains with the guest's subnet and IP information for OTEL Collector config.
   # Extract IP without CIDR notation (remove /XX suffix)
   local ip_no_cidr="${NET4_IP%/*}"
-  sed -i "/# This is the domain of the URL that the logs are coming from/{n;s|.*|        value: \"${ip_no_cidr}\"|}" ${otel_collector_config_file}
-  sed -i "/# This is the subnet ID of the GCP project/{n;s|.*|        value: \"${local_subnet_id}\"|}" ${otel_collector_config_file}
 
-  systemctl stop otelcol
-  systemctl start otelcol
+  # Set grains for otel-collector config template
+  salt-call --local grains.setval otel_url_domain "${ip_no_cidr}"
+  salt-call --local grains.setval otel_subnet_id "${local_subnet_id}"
+
+  # Re-apply the otelcol state to regenerate the config with new grain values
+  salt-call --local state.apply monitoring.otelcol
+
+  systemctl restart otelcol
 }

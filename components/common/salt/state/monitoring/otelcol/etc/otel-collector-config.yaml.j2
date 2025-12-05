@@ -42,18 +42,10 @@ processors:
     attributes:
       - key: "url.domain"
         action: "insert"
-        ### The following section will be updated by init_logging_facilities in common.sh
-        ### BEGIN AUTO SECTION, DO NOT EDIT
-        # This is the domain of the URL that the logs are coming from
-        value: "<URL_DOMAIN>"
-        ### END AUTO SECTION
+        value: "{{ grains.get('otel_url_domain', grains.get('fqdn', '<URL_DOMAIN>')) }}"
       - key: "lit.subnet.id"
         action: "insert"
-        ### The following section will be updated by init_logging_facilities in common.sh
-        ### BEGIN AUTO SECTION, DO NOT EDIT
-        # This is the subnet ID of the GCP project
-        value: "<SUBNET_ID>"
-        ### END AUTO SECTION
+        value: "{{ grains.get('otel_subnet_id', pillar.get('subnet_id', '<SUBNET_ID>')) }}"
 
 exporters:
   googlecloud:
