@@ -33,4 +33,3 @@ rust_build_dir:
 
 tmp_dir: "/var/tmp"
 
-enable_chronicle_replica: true

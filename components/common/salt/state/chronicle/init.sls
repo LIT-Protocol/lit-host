@@ -20,7 +20,10 @@ litos_host_pkg_add_{{ p }}:
   {% endif %}
 {% endfor %}
 
-{% set replica_enabled = pillar.get('enable_chronicle_replica', False) %}
+# NOTE: Temporarily suppressing Chronicle Replica in production by default.
+#       You can enable it by setting `enable_chronicle_replica: True` in pillar (defaults.sls).
+#       This is a stopgap to prevent accidental prod replica deployment; remove/change once tested/supports prod.
+{% set replica_enabled = pillar.get('enable_chronicle_replica', pillar.get('env') != 'prod') %}
 
 {% if ns.all_keys_present and replica_enabled %}
 print_notification:
