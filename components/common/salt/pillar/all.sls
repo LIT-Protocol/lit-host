@@ -5,7 +5,6 @@ include:
   - local.secrets
   - local.secrets-prov
   - groups
-  - users
   - local.users
   - git
   - local.git
