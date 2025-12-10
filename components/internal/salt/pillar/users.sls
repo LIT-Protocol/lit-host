@@ -1,18 +1,4 @@
 users:
-  mike:
-    active: True
-    name: Mike L
-    email: mike@litprotocol.com
-    shell: /bin/bash
-    groups:
-      - lit
-      - admin
-    access:
-      - prod
-      - staging
-      - dev
-    ssh_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyCKHIxBG7XlMpDqyI7GKvNv7UCkdd4mCnEGV98xObH
   chris:
     active: True
     name: Chris C
@@ -29,21 +15,6 @@ users:
       - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJBadixwLYNJje+dMIbei9mnAfagGV7EGH1G0sJNaXLP4t3qiJnZpApubSoV/6oEcf3O8MNbPh153VnnrUpYgfA= Lit-Protocol@secretive.h4ckb00k-m1.local
       - ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBIpMMJlUMi+5301UJyFw2yJX9Cs53RgGKvnODCW/qJGSw9IcoIHxlfdmmE/Dhy82jTKh44K8Ur2FCaXmnwknj59zqrZ7l2jrOC3IuduQ0KrYTp3Sbkyk3acESIBJ7/PURw== Key-For-PIV-Authentication-(chris)@secretive.h4ckb00k-m1.local
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP5uQh+KHcXs9LYyhkzBDcZv4HYgjRDzK8eDf+VOQVHi chris@litprotocol.com
-  howard:
-    active: True
-    name: Howard
-    email: howard@litprotocol.com
-    shell: /bin/bash
-    groups:
-      - lit
-      - admin
-    access:
-      - prod
-      - staging
-      - dev
-    ssh_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE5Ue8ib58nHNCbWaaZzFSstZVdSu5p6p27ISjz6yhNi howard.tam.95@gmail.com
-      - ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFx4XvIefOJOJAVPNeAzT8NolNTt7KLMOP05UboxtGHNwxgkHiQQqulXUz90l6jCwl5/oSCINWiE4yjPmkB+WRU= Git@secretive.Howard’s-MacBook-Pro.local
   brendon:
     active: True
     name: Brendon
