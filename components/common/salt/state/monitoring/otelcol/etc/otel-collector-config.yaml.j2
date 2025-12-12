@@ -42,10 +42,10 @@ processors:
     attributes:
       - key: "url.domain"
         action: "insert"
-        value: "{{ grains.get('otel_url_domain', grains.get('fqdn', '<URL_DOMAIN>')) }}"
+        value: "{{ grains.get('otel_guest_ip', '<GUEST_IP>') }}"
       - key: "lit.subnet.id"
         action: "insert"
-        value: "{{ grains.get('otel_subnet_id', pillar.get('subnet_id', '<SUBNET_ID>')) }}"
+        value: "{{ grains.get('otel_guest_subnet_id', '<SUBNET_ID>') }}"
 
 exporters:
   googlecloud:

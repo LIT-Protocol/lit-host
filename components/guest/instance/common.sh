@@ -192,8 +192,8 @@ EOF
   local ip_no_cidr="${NET4_IP%/*}"
 
   # Set grains for otel-collector config template
-  salt-call --local grains.setval otel_url_domain "${ip_no_cidr}"
-  salt-call --local grains.setval otel_subnet_id "${local_subnet_id}"
+  salt-call --local grains.setval otel_guest_ip "${ip_no_cidr}"
+  salt-call --local grains.setval otel_guest_subnet_id "${local_subnet_id}"
 
   # Re-apply the otelcol state to regenerate the config with new grain values
   salt-call --local state.apply monitoring.otelcol
