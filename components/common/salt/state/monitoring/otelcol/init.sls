@@ -38,7 +38,8 @@ print_otelcol_notification:
 
 /etc/monitoring/otelcol/otel-collector-config.yaml:
   file.managed:
-    - source: salt://monitoring/otelcol/etc/otel-collector-config.yaml
+    - source: salt://monitoring/otelcol/etc/otel-collector-config.yaml.j2
+    - template: jinja
     - mode: 0644
     - makedirs: True
 
