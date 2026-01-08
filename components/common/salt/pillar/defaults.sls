@@ -14,7 +14,7 @@ root_email: admin@litprotocol.com
 
 timezone: America/New_York
 
-rust_default_toolchain: 1.83
+rust_default_toolchain: 1.91
 
 grub_cmdline_linux_default: quiet
 grub_gfxpayload_linux: text
