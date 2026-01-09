@@ -20,10 +20,10 @@ litos_host_pkg_add_{{ p }}:
   {% endif %}
 {% endfor %}
 
-# NOTE: Temporarily suppressing Chronicle Replica in production by default.
-#       You can enable it by setting `enable_chronicle_replica: True` in pillar (defaults.sls).
-#       This is a stopgap to prevent accidental prod replica deployment; remove/change once tested/supports prod.
-{% set replica_enabled = pillar.get('enable_chronicle_replica', pillar.get('env') != 'prod') %}
+# NOTE: Chronicle Replica only runs on 'node' type hosts (not prov) and not in production by default.
+#       You can override by setting `enable_chronicle_replica: True` in pillar (defaults.sls).
+{% set host_type = pillar.get('litos_host_type', '') %}
+{% set replica_enabled = pillar.get('enable_chronicle_replica', host_type == 'node' and pillar.get('env') != 'prod') %}
 
 {% if ns.all_keys_present and replica_enabled %}
 print_notification:
@@ -122,6 +122,6 @@ install_chronicle:
 print_notification:
   test.show_notification:
     - text: " "
-    - name: "Chronicle keys missing in secrets.sls OR replica explicitly disabled via LitConfig. Not installing Chronicle Replica!"
+    - name: "Chronicle keys missing in secrets.sls OR host type is 'prov' OR replica explicitly disabled. Not installing Chronicle Replica!"
 
 {% endif %}
