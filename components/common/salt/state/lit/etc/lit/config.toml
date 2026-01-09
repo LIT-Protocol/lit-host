@@ -22,10 +22,10 @@ chain_id = "{{ pillar.blockchain.chain[ pillar.env ].id }}"
 chain_name = "{{ pillar.blockchain.chain[ pillar.env ].name }}"
 
 [node]
-# NOTE: Temporarily suppressing Chronicle Replica in production by default.
-#       You can enable it by setting `enable_chronicle_replica: True` in pillar (defaults.sls).
-#       This is a stopgap to prevent accidental prod replica deployment; remove/change once tested/supports prod.
-enable_chronicle_replica = {{ pillar.get('enable_chronicle_replica', pillar.get('env') != 'prod') | string | lower }}
+# NOTE: Chronicle Replica only runs on 'node' type hosts (not prov) and not in production by default.
+#       You can override by setting `enable_chronicle_replica: True` in pillar (defaults.sls).
+{% set host_type = pillar.get('litos_host_type', '') %}
+enable_chronicle_replica = {{ pillar.get('enable_chronicle_replica', host_type == 'node' and pillar.get('env') != 'prod') | string | lower }}
 
 {% for contract_key, contract in pillar.blockchain.get('contract', {}).items() %}
 {%- for method_name, method in contract.items() %}
