@@ -22,7 +22,7 @@ litos_host_pkg_add_{{ p }}:
 
 # NOTE: Chronicle Replica only runs on 'node' type hosts (not prov) and not in production by default.
 #       You can override by setting `enable_chronicle_replica: True` in pillar (defaults.sls).
-{% set replica_enabled = pillar.get('enable_chronicle_replica', host_type == 'node' and pillar.get('env') != 'prod') %}
+{% set replica_enabled = pillar.get('enable_chronicle_replica', pillar.get('litos_host_type', '') == 'node' and pillar.get('env') != 'prod') %}
 
 {% if ns.all_keys_present and replica_enabled %}
 print_notification:
